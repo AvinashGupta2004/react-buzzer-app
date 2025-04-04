@@ -39,7 +39,6 @@ function JoinGameScreen(){
                 buzzerRef.current?.reset();
             }, 100);
         };
-
         socket.on("roomStateUpdate", handleRoomStateUpdate);
         socket.on("newBuzz", handleNewBuzz);
         socket.on("startGame", handleGameStart);
@@ -62,22 +61,29 @@ function JoinGameScreen(){
             socket.emit("buzz",{roomCode:location.state.roomCode,playerName:location.state.playerName})
         }
     }
-
+    const leaveRoom = ()=>{
+        socket.emit("leaveRoom",{roomCode:location.state.roomCode,playerName:location.state.playerName});
+        navigate("/");
+    }
     return (
         <main className={`h-full p-6`}>
             <header className="mb-6">
-                <main className={`p-4 px-16 flex justify-center items-center`}>
+                <main className={`p-4 md:px-16 flex justify-between items-center`}>
                     <section>
                         <span className={`font-montserrat font-extrabold text-4xl`}>
                             <span className={`text-blue-600`}>Buzz</span>Up
                         </span>
                     </section>
+                    <button onClick={leaveRoom}
+                            className={`text-md border-1 rounded-lg border-gray-300 bg-gray-50 font-semibold text-gray-800 font-nunito p-2 px-4`}>
+                        Leave
+                    </button>
                 </main>
             </header>
             <section>
                 <article className={`flex flex-col gap-3 justify-start items-center`}>
                     <header className={`flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-6`}>
-                        <div className={`flex flex-col sm:flex-row justify-center items-center sm:gap-2`}>
+                    <div className={`flex flex-col sm:flex-row justify-center items-center sm:gap-2`}>
                             <div className={`text-lg font-work font-medium`}>Room Code</div>
                             <div
                                 className={`p-2 px-3 text-xl text-blue-800 font-work font-bold rounded-lg bg-blue-50 border-1 border-blue-300 tracking-widest`}>

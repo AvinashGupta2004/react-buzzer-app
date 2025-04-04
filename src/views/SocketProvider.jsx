@@ -7,7 +7,8 @@ export function SocketProvider({children}){
     const [socket,setSocket] = useState(null);
 
     useEffect(()=>{
-        const newSocket = io("https://react-buzzer-app-server.onrender.com");
+        const uri = "https://react-buzzer-app-server.onrender.com";
+        const newSocket = io("http://localhost:4000");
         setSocket(newSocket);
 
         return(()=>{
