@@ -4,7 +4,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { MdDangerous } from "react-icons/md";
 function ToastNotify({type,message}){
     const styles = {
-        "success":{
+        "info":{
             backgroundColor:"bg-green-50",
             borderColor:"border-green-300",
             textColor:"text-green-700",

@@ -24,7 +24,6 @@ function HostScreen() {
         }
 
         const handleRoomStateUpdate = ({ room }) => {
-            console.log("Room State Updated:", room);
             setPlayers([...room.players]);
             setBuzzes([...room.buzzes]);
             setIsGameActive(room.isGameActive);
@@ -54,7 +53,9 @@ function HostScreen() {
             socket.emit("startGame", { roomCode });
         }
     };
-
+    const killRoom = ()=>{
+        socket.emit("killRoom");
+    }
     const resetGame = () => {
         socket.emit("resetGame", { roomCode });
 
@@ -71,17 +72,20 @@ function HostScreen() {
     return (
         <main className="h-full p-6">
             <header className="mb-6">
-                <div className="p-4 px-16 flex justify-center items-center">
+                <div className="p-4 md:px-16 flex justify-between items-center">
                     <h1 className="font-montserrat font-extrabold text-4xl">
                         <span className="text-blue-600">Buzz</span>Up
                     </h1>
+                    <button onClick = {killRoom} className={`text-md border-1 rounded-lg border-gray-300 bg-gray-50 font-semibold text-gray-800 font-nunito p-2 px-4`}>Exit Room</button>
                 </div>
             </header>
 
             <section className="flex flex-col gap-3 justify-start items-center">
-                <header className="flex justify-center items-center gap-6">
-                    <InfoBox label="Room Code" value={roomCode}  textColor={`text-blue-700`}/>
-                    <InfoBox label="Players" value={players.length}  textColor={`text-blue-700`}/>
+                <header className="flex flex-col justify-center items-center md:flex-row md:gap-6 gap-3">
+                    <div className={`flex flex-row gap-5`}>
+                        <InfoBox label="Room Code" value={roomCode}  textColor={`text-blue-700`}/>
+                        <InfoBox label="Players" value={players.length}  textColor={`text-blue-700`}/>
+                    </div>
                     <InfoBox label="Your Name" value={hostName} highlight textColor={`text-yellow-700`}/>
                 </header>
 
@@ -101,7 +105,7 @@ function HostScreen() {
 
             <section>
                 <h3 className="text-center text-2xl font-poppins font-semibold mb-2">Leaderboard</h3>
-                <div className="w-[60%] mt-4 mx-auto flex flex-col justify-center gap-3 overflow-y-auto">
+                <div className="w-full lg:w-[60%] mt-4 mx-auto flex flex-col justify-center gap-3 overflow-y-auto">
                     {buzzes.map((buzz, index) => (
                         <Rank key={index} rank={index + 1} name={buzz.playerName} />
                     ))}
@@ -112,7 +116,7 @@ function HostScreen() {
 }
 
 const InfoBox = ({ label, value, highlight ,textColor}) => (
-    <div className="flex justify-center items-center gap-2">
+    <div className="flex flex-col md:flex-row justify-center items-center gap-1">
         <div className="text-lg font-work font-medium">{label}</div>
         <div className={`p-2 px-3 text-xl font-work font-bold rounded-lg border-1 tracking-wide ${highlight ? "bg-amber-50 border-amber-300" : "bg-blue-50 border-blue-300"} ${textColor}`}>
             {value}

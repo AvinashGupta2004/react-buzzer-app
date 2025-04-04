@@ -60,7 +60,9 @@ function HomeScreen() {
 
     function handleCreateRoom(e) {
         e.preventDefault();
+
         if (createNickName.trim()) {
+            addToast("info","Joining you in!")
             socket.emit("createRoom", {
                 hostName: createNickName
             });
@@ -99,7 +101,7 @@ function HomeScreen() {
                     </h4>
                 </section>
 
-                <section className="flex justify-start items-stretch w-[90%] gap-14 mx-auto">
+                <section className="flex flex-col justify-start items-stretch w-[90%] gap-14 mx-auto md:flex-row">
                     {/* Join Room Card */}
                     <article className="p-6 border-4 border-blue-100 w-full rounded-xl flex flex-col justify-start items-center bg-white">
                         <div className="flex mb-1 gap-3 justify-center items-center">
@@ -113,7 +115,7 @@ function HomeScreen() {
                         </p>
 
                         <div className="my-2 mt-4 w-full">
-                            <div className="w-[70%] mx-auto flex flex-col justify-start items-start mt-2 gap-0">
+                            <div className="w-full lg:w-[70%] mx-auto flex flex-col justify-start items-start mt-2 gap-0">
                                 <label className="text-sm text-gray-700 font-work font-semibold">Room Code</label>
                                 <input
                                     type="text"
@@ -123,7 +125,7 @@ function HomeScreen() {
                                     required
                                 />
                             </div>
-                            <div className="w-[70%] mx-auto flex flex-col justify-start items-start mt-2 gap-0">
+                            <div className="w-full lg:w-[70%] mx-auto flex flex-col justify-start items-start mt-2 gap-0">
                                 <label className="text-sm text-gray-700 font-work font-semibold">Nickname</label>
                                 <input
                                     type="text"
@@ -156,7 +158,7 @@ function HomeScreen() {
                         </p>
 
                         <div className="my-2 w-full">
-                            <div className="w-[70%] mx-auto flex flex-col justify-start items-start mt-2 gap-0">
+                            <div className="w-full lg:w-[70%] mx-auto flex flex-col justify-start items-start mt-2 gap-0">
                                 <label className="text-sm text-gray-700 font-work font-semibold">Nickname</label>
                                 <input
                                     type="text"

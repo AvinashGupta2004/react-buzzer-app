@@ -44,6 +44,9 @@ function JoinGameScreen(){
         socket.on("newBuzz", handleNewBuzz);
         socket.on("startGame", handleGameStart);
         socket.on("resetGame", handleGameReset);
+        socket.on('disconnect',()=>{
+            navigate("/");
+        })
 
         return () => {
             socket.off("roomStateUpdate", handleRoomStateUpdate);
@@ -73,15 +76,15 @@ function JoinGameScreen(){
             </header>
             <section>
                 <article className={`flex flex-col gap-3 justify-start items-center`}>
-                    <header className={`flex justify-center items-center gap-6`}>
-                        <div className={`flex justify-center items-center gap-2`}>
+                    <header className={`flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-6`}>
+                        <div className={`flex flex-col sm:flex-row justify-center items-center sm:gap-2`}>
                             <div className={`text-lg font-work font-medium`}>Room Code</div>
                             <div
                                 className={`p-2 px-3 text-xl text-blue-800 font-work font-bold rounded-lg bg-blue-50 border-1 border-blue-300 tracking-widest`}>
                                 {location.state.roomCode}
                             </div>
                         </div>
-                        <div className={`flex justify-center items-center gap-2`}>
+                        <div className={`flex flex-col sm:flex-row justify-center items-center sm:gap-2`}>
                             <div className={`text-lg font-work font-medium`}>Your Name</div>
                             <div
                                 className={`p-2 px-4 flex justify-center items-center gap-4 bg-amber-50 border-1 border-amber-300 rounded-lg`}>
@@ -105,7 +108,7 @@ function JoinGameScreen(){
                 <hr className={`mx-[20%] mt-10 mb-6`}/>
                 <article className={``}>
                     <h3 className={`text-center text-2xl font-poppins font-semibold mb-2`}>Leaderboard</h3>
-                    <figure className={`w-[60%] mt-4 mx-auto flex flex-col justify-center gap-3 overflow-y-auto`}>
+                    <figure className={`w-full lg:w-[60%] mt-4 mx-auto flex flex-col justify-center gap-3 overflow-y-auto`}>
                         {
                             buzzes.map((buzz,index)=>{
                                 return(
