@@ -3,19 +3,33 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSocket } from "./SocketProvider.jsx";
 import { useState, useEffect, useRef } from "react";
 import BuzzerBtn from "./BuzzerBtn.jsx";
+import ToastNotify from "./ToastNotify.jsx"
+import buzzSound from "../../public/buzzsound.mp3";
 
 function HostScreen() {
     const location = useLocation();
     const socket = useSocket();
     const navigate = useNavigate();
-
+    const [toasts, setToasts] = useState([]);
     const [players, setPlayers] = useState([]);
     const [isGameActive, setIsGameActive] = useState(false);
     const [buzzes, setBuzzes] = useState([]);
     const buzzerRef = useRef();
-
     const roomCode = location.state?.roomCode;
     const hostName = location.state?.hostName;
+
+    function addToast(type, message) {
+        notifySound();
+        setToasts([...toasts, { type, message }]);
+        setTimeout(() => {
+            setToasts([]);
+        }, 4000);
+    }
+
+    function notifySound(){
+        const audio = new Audio(buzzSound);
+        audio.play();
+    }
 
     useEffect(() => {
         if (!socket || !roomCode) {
@@ -27,8 +41,14 @@ function HostScreen() {
             setPlayers([...room.players]);
             setBuzzes([...room.buzzes]);
             setIsGameActive(room.isGameActive);
+            notifySound();
         };
-
+        const handleRoomExit = ()=>{
+            addToast("error","Room closed by Host");
+            setTimeout(()=>{
+                navigate("/");
+            },4500);
+        }
         const handleNewBuzz = (newBuzz) => {
             setBuzzes(prev => [...prev, newBuzz]);
         };
@@ -39,12 +59,13 @@ function HostScreen() {
 
         socket.on("roomStateUpdate", handleRoomStateUpdate);
         socket.on("newBuzz", handleNewBuzz);
+        socket.on("exitRoom",handleRoomExit);
         socket.on("disconnect", handleDisconnect);
-
         return () => {
             socket.off("roomStateUpdate", handleRoomStateUpdate);
             socket.off("newBuzz", handleNewBuzz);
             socket.off("disconnect", handleDisconnect);
+            socket.off("exitRoom",handleRoomExit);
         };
     }, [socket, roomCode, navigate]);
 
@@ -53,8 +74,10 @@ function HostScreen() {
             socket.emit("startGame", { roomCode });
         }
     };
+
     const killRoom = ()=>{
-        socket.emit("killRoom");
+        console.log("kill room called")
+        socket.emit("killRoom",{roomCode:roomCode});
     }
     const resetGame = () => {
         socket.emit("resetGame", { roomCode });
@@ -76,15 +99,18 @@ function HostScreen() {
                     <h1 className="font-montserrat font-extrabold text-4xl">
                         <span className="text-blue-600">Buzz</span>Up
                     </h1>
-                    <button onClick = {killRoom} className={`text-md border-1 rounded-lg border-gray-300 bg-gray-50 font-semibold text-gray-800 font-nunito p-2 px-4`}>Exit Room</button>
+                    <button onClick={killRoom}
+                            className={`text-md border-1 rounded-lg border-gray-300 bg-gray-50 font-semibold text-gray-800 font-nunito p-2 px-4`}>Exit
+                        Room
+                    </button>
                 </div>
             </header>
 
             <section className="flex flex-col gap-3 justify-start items-center">
                 <header className="flex flex-col justify-center items-center md:flex-row md:gap-6 gap-3">
                     <div className={`flex flex-row gap-5`}>
-                        <InfoBox label="Room Code" value={roomCode}  textColor={`text-blue-700`}/>
-                        <InfoBox label="Players" value={players.length}  textColor={`text-blue-700`}/>
+                        <InfoBox label="Room Code" value={roomCode} textColor={`text-blue-700`}/>
+                        <InfoBox label="Players" value={players.length} textColor={`text-blue-700`}/>
                     </div>
                     <InfoBox label="Your Name" value={hostName} highlight textColor={`text-yellow-700`}/>
                 </header>
@@ -93,29 +119,35 @@ function HostScreen() {
                     <h5 className="text-center text-2xl font-semibold font-nunito">
                         {isGameActive ? "Game is Running!" : "Waiting for Game to Start!"}
                     </h5>
-                    <BuzzerBtn whomFor="host" handler={startGame} ref={buzzerRef} />
+                    <BuzzerBtn whomFor="host" handler={startGame} ref={buzzerRef}/>
                 </div>
 
-                <button onClick={resetGame} className="text-md cursor-pointer rounded-lg bg-gray-100 border-1 border-gray-300 p-2 px-4 font-work text-gray-700 font-semibold">
+                <button onClick={resetGame}
+                        className="text-md cursor-pointer rounded-lg bg-gray-100 border-1 border-gray-300 p-2 px-4 font-work text-gray-700 font-semibold">
                     Reset Game
                 </button>
             </section>
 
-            <hr className="mx-[20%] mt-10 mb-6" />
+            <hr className="mx-[20%] mt-10 mb-6"/>
 
             <section>
                 <h3 className="text-center text-2xl font-poppins font-semibold mb-2">Leaderboard</h3>
                 <div className="w-full lg:w-[60%] mt-4 mx-auto flex flex-col justify-center gap-3 overflow-y-auto">
                     {buzzes.map((buzz, index) => (
-                        <Rank key={index} rank={index + 1} name={buzz.playerName} />
+                        <Rank key={index} rank={index + 1} name={buzz.playerName}/>
                     ))}
                 </div>
             </section>
+            <div>
+                {toasts.map((toast, index) => (
+                    <ToastNotify key={index} type={toast.type} message={toast.message}/>
+                ))}
+            </div>
         </main>
     );
 }
 
-const InfoBox = ({ label, value, highlight ,textColor}) => (
+const InfoBox = ({label, value, highlight, textColor}) => (
     <div className="flex flex-col md:flex-row justify-center items-center gap-1">
         <div className="text-lg font-work font-medium">{label}</div>
         <div className={`p-2 px-3 text-xl font-work font-bold rounded-lg border-1 tracking-wide ${highlight ? "bg-amber-50 border-amber-300" : "bg-blue-50 border-blue-300"} ${textColor}`}>
